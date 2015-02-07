@@ -75,7 +75,7 @@ cbsa  | cbsa_name
 '10760' | 'Alexander City, AL'
 '10780' | 'Alexandria, LA'
 ... | ...
- 
+
 #### 2. [Location Affordability Index: All Census Counties](http://catalog.data.gov/dataset/location-affordability-index-all-census-counties)
 
 There are 3,144 counties with identifiers ranging from '01001' to '56045'.
@@ -130,7 +130,7 @@ Resources:
  + [CSA Shapes](https://catalog.data.gov/dataset/r2-combined-statistical-area-csa-2013-tiger-line-shapefile)
  + [CBSA Shapes](https://catalog.data.gov/dataset/r2-core-based-statistical-area-cbsa-2013-tiger-line-shapefile)
  + https://www.census.gov/geo/maps-data/data/tiger-cart-boundary.html
- + [Cartographic Boundary Shapefiles - Metropolitan and Micropolitan Statistical Areas and Related Statistical Areas](https://www.census.gov/geo/maps-data/data/cbf/cbf_msa.html)
+ + [Cartographic Boundary Shapefiles - Metropolitan and Micropolitan Statistical Areas and Related Statistical Areas](https://www.census.gov/geo/maps-data/data/cbf/cbf_msa.html) -- 500k, 5m, 20m
  + [Cartographic Boundary Shapefiles - Counties](https://www.census.gov/geo/maps-data/data/cbf/cbf_counties.html) -- 500k, 5m, 20m
  + [Cartographic Boundary Shapefiles - Places (Incorporated Places and Census Designated Places)](https://www.census.gov/geo/maps-data/data/cbf/cbf_place.html) -- state by state datasets
  + http://ben.balter.com/2013/06/26/how-to-convert-shapefiles-to-geojson-for-use-on-github/
@@ -143,4 +143,9 @@ Manual Process Documentation:
 ```` sh
 cd cb_2013_us_cbsa_5m/
 ogr2ogr -f GeoJSON -t_srs crs:84 cb_2013_us_cbsa_5m.geojson cb_2013_us_cbsa_5m.shp
+````
+
+```` sh
+cd cb_2013_us_county_5m/
+ogr2ogr -f GeoJSON -t_srs crs:84 cb_2013_us_county_5m.geojson cb_2013_us_county_5m.shp
 ````
