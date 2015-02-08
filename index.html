@@ -2,7 +2,7 @@
 <html>
 <head>
   <meta charset="utf-8">
-  <title>Income and Affordability by United States Geography</title>
+  <title>Income and Affordability Measures by United States Geography</title>
   <link href='https://api.tiles.mapbox.com/mapbox.js/v2.1.4/mapbox.css' rel='stylesheet' />
   <style type="text/css">
 
@@ -10,13 +10,13 @@
       // h1 {display:inline-block;}
       // #menu {display:inline-block;}
       #geo-type-selector {display:inline-block;}
-      #map-container {height: 35em; width:100%; border:1px solid #000;}
+      #map-container, #chart-container {height: 38em; width:100%; border:1px solid #000; margin-top:2em; margin-bottom:2em;}
 
   </style>
 </head>
 <body>
   <header>
-    <h1>Income and Affordability by United States Geography</h1>
+    <h1>Income and Affordability Measures by United States Geography</h1>
     <div id="menu">
       <select id="statistic-selector">
         <option value="mean" selected="true">Mean</option>
@@ -27,11 +27,11 @@
         <option value="housings" selected="true">Housing Cost as Percent of Income</option>
         <option value="renter_housings">Housing Cost as Percent of Income (Renters)</option>
         <option value="owner_housings">Housing Cost as Percent of Income (Owners)</option>
-        <!--option value="renter_vs_owner_housings">Housing Cost as Percent of Income (Renters vs Owners)</option-->
+        <option value="renter_vs_owner_housings">Housing Cost as Percent of Income (Renters diff from Owners)</option>
         <option value="housing_and_transportations">Housing and Transportation Cost as Percent of Income</option>
         <option value="renter_housing_and_transportations">Housing and Transportation Cost as Percent of Income (Renters)</option>
         <option value="owner_housing_and_transportations">Housing and Transportation Cost as Percent of Income (Owners)</option>
-        <!--option value="renter_vs_owner_housing_and_transportations">Housing and Transportation Cost as Percent of Income (Renters vs Owners)</option-->
+        <option value="renter_vs_owner_housing_and_transportations">Housing and Transportation Cost as Percent of Income (Renters diff from Owners)</option>
       </select>
       <select id="geo-type-selector">
         <option value="cbsa" selected="true">by Core Based Statistical Area (CBSA)</option>
@@ -40,6 +40,7 @@
     </div>
   </header>
   <div id="map-container"></div>
+  <!--div id="chart-container"></div-->
   <footer>
     <p>
       <a href="http://bl.ocks.org/s2t2/cd45dfd8007fcf83fef7">view</a> | 
@@ -145,7 +146,7 @@
               break;
           case "renter_vs_owner_housings":
           case "renter_vs_owner_housing_and_transportations":
-              var color_palette = colorbrewer.RdYlGn[9]
+              var color_palette = colorbrewer.Blues[9]
               break;
           }
 
@@ -190,7 +191,6 @@
               var affordability_data_file = "lai_data_us_counties.csv"
               break;
           }
-          // console.log("geojson_data_file: " + geojson_data_file + "; affordability_data_file: " + affordability_data_file)
 
           // Get and transform data.
 
@@ -209,7 +209,27 @@
                       "owner_housings": [ parseFloat(row.hh_type1_h_own), parseFloat(row.hh_type2_h_own), parseFloat(row.hh_type3_h_own), parseFloat(row.hh_type4_h_own), parseFloat(row.hh_type5_h_own), parseFloat(row.hh_type6_h_own), parseFloat(row.hh_type7_h_own), parseFloat(row.hh_type8_h_own) ],
                       "housing_and_transportations": [ parseFloat(row.hh_type1_ht), parseFloat(row.hh_type2_ht), parseFloat(row.hh_type3_ht), parseFloat(row.hh_type4_ht), parseFloat(row.hh_type5_ht), parseFloat(row.hh_type6_ht), parseFloat(row.hh_type7_ht), parseFloat(row.hh_type8_ht) ],
                       "renter_housing_and_transportations": [ parseFloat(row.hh_type1_ht_rent), parseFloat(row.hh_type2_ht_rent), parseFloat(row.hh_type3_ht_rent), parseFloat(row.hh_type4_ht_rent), parseFloat(row.hh_type5_ht_rent), parseFloat(row.hh_type6_ht_rent), parseFloat(row.hh_type7_ht_rent), parseFloat(row.hh_type8_ht_rent) ],
-                      "owner_housing_and_transportations": [ parseFloat(row.hh_type1_ht_own), parseFloat(row.hh_type2_ht_own), parseFloat(row.hh_type3_ht_own), parseFloat(row.hh_type4_ht_own), parseFloat(row.hh_type5_ht_own), parseFloat(row.hh_type6_ht_own), parseFloat(row.hh_type7_ht_own), parseFloat(row.hh_type8_ht_own) ]
+                      "owner_housing_and_transportations": [ parseFloat(row.hh_type1_ht_own), parseFloat(row.hh_type2_ht_own), parseFloat(row.hh_type3_ht_own), parseFloat(row.hh_type4_ht_own), parseFloat(row.hh_type5_ht_own), parseFloat(row.hh_type6_ht_own), parseFloat(row.hh_type7_ht_own), parseFloat(row.hh_type8_ht_own) ],
+                      "renter_vs_owner_housings": [
+                          parseFloat(row.hh_type1_h_own) - parseFloat(row.hh_type1_h_rent),
+                          parseFloat(row.hh_type2_h_own) - parseFloat(row.hh_type2_h_rent),
+                          parseFloat(row.hh_type3_h_own) - parseFloat(row.hh_type3_h_rent),
+                          parseFloat(row.hh_type4_h_own) - parseFloat(row.hh_type4_h_rent),
+                          parseFloat(row.hh_type5_h_own) - parseFloat(row.hh_type5_h_rent),
+                          parseFloat(row.hh_type6_h_own) - parseFloat(row.hh_type6_h_rent),
+                          parseFloat(row.hh_type7_h_own) - parseFloat(row.hh_type7_h_rent),
+                          parseFloat(row.hh_type8_h_own) - parseFloat(row.hh_type8_h_rent)
+                      ], // negative values indicate renter is paying relatively more as percent of income; positive values indicate owner is paying relatively more
+                      "renter_vs_owner_housing_and_transportations": [
+                          parseFloat(row.hh_type1_ht_own) - parseFloat(row.hh_type1_ht_rent),
+                          parseFloat(row.hh_type2_ht_own) - parseFloat(row.hh_type2_ht_rent),
+                          parseFloat(row.hh_type3_ht_own) - parseFloat(row.hh_type3_ht_rent),
+                          parseFloat(row.hh_type4_ht_own) - parseFloat(row.hh_type4_ht_rent),
+                          parseFloat(row.hh_type5_ht_own) - parseFloat(row.hh_type5_ht_rent),
+                          parseFloat(row.hh_type6_ht_own) - parseFloat(row.hh_type6_ht_rent),
+                          parseFloat(row.hh_type7_ht_own) - parseFloat(row.hh_type7_ht_rent),
+                          parseFloat(row.hh_type8_ht_own) - parseFloat(row.hh_type8_ht_rent)
+                      ]// negative values indicate renter is paying relatively more; positive values indicate owner is paying relatively more
                   }
 
                   affordabilities.set(identifier, affordability)
