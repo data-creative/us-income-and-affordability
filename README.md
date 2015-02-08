@@ -29,7 +29,7 @@ What are renter's rights? What resources are available to renters?
 
 ### Solution
 
-#### Open Datasets
+#### Datasets
 
 ##### Affordability Data
 
@@ -53,7 +53,7 @@ COLUMN | SUFFIX | DESCRIPTION
 `t` |  The modeled transportation costs as a percent of income.
 ... | ...
 
-1. [Location Affordability Index: All Core Based Statistical Areas (CBSAs)](http://catalog.data.gov/dataset/location-affordability-index-all-core-based-statistical-areas-cbsas)
+###### 1. [Location Affordability Index: All Core Based Statistical Areas (CBSAs)](http://catalog.data.gov/dataset/location-affordability-index-all-core-based-statistical-areas-cbsas)
 
 There are [943](http://en.wikipedia.org/wiki/List_of_Core_Based_Statistical_Areas) [CBSAs](http://en.wikipedia.org/wiki/Core_Based_Statistical_Area) with identifiers ranging from '10020' to '49780'.
 
@@ -78,7 +78,7 @@ cbsa  | cbsa_name
 '10780' | 'Alexandria, LA'
 ... | ...
 
-2. [Location Affordability Index: All Census Counties](http://catalog.data.gov/dataset/location-affordability-index-all-census-counties)
+###### 2. [Location Affordability Index: All Census Counties](http://catalog.data.gov/dataset/location-affordability-index-all-census-counties)
 
 There are 3,144 counties with identifiers ranging from '01001' to '56045'.
 
@@ -102,7 +102,7 @@ county  | county_name
 '01031' | 'Coffee'
 ... | ...
 
-3. [Location Affordability Index: All Census Places](http://catalog.data.gov/dataset/location-affordability-index-all-census-places)
+###### 3. [Location Affordability Index: All Census Places](http://catalog.data.gov/dataset/location-affordability-index-all-census-places)
 
 There are 24,011 places with identifiers ranging from '0100100' to '5686737'.
 
@@ -141,7 +141,7 @@ Resources:
  + http://www.census.gov/data/developers/data-sets.html
  + http://www.census.gov/data/developers/data-sets/TIGERweb-map-service.html
 
-Manual Process Documentation:
+Shapefile to GeoJSON conversion process:
 
 ```` sh
 brew install gdal
@@ -157,6 +157,7 @@ cd cb_2013_us_county_5m/
 ogr2ogr -f GeoJSON -t_srs crs:84 cb_2013_us_county_5m.geojson cb_2013_us_county_5m.shp
 ````
 
-#### Open Maps
+#### Maps
+
 
 
