@@ -3,7 +3,6 @@
 <head>
   <meta charset="utf-8">
   <title>Affordability in the United States</title>
-  <script src='https://api.tiles.mapbox.com/mapbox.js/v2.1.4/mapbox.js'></script>
   <link href='https://api.tiles.mapbox.com/mapbox.js/v2.1.4/mapbox.css' rel='stylesheet' />
   <style type="text/css">
 
@@ -15,9 +14,9 @@
 <body>
   <header><h1>Affordability in the United States</h1></header>
   <div id="menu">
-    <select id="geo_type_selector">
+    <select id="geo-type-selector">
       <option value="county" >by County</option>
-      <option value="cbsa" selected="true">by Core Based Statistical Area (CBSA)</option>
+      <option value="statistical_area" selected="true">by Core Based Statistical Area (CBSA)</option>
     </select>
   </div>
   <div id="map-container"></div>
@@ -28,39 +27,107 @@
     </p>
   </footer>
   <script src="http://d3js.org/d3.v3.min.js" charset="utf-8"></script>
+  <script src='https://api.tiles.mapbox.com/mapbox.js/v2.1.4/mapbox.js'></script>
   <script type="text/javascript">
 
       // Get, set, and observe selected geography type.
 
-      var geo_type_selector = document.getElementById("geo_type_selector")
-
+      var geo_type_selector = document.getElementById("geo-type-selector")
       var selected_geo_type = geo_type_selector.value
-
       geo_type_selector.addEventListener("change", selectGeoType, false)
 
       function selectGeoType(){
-          console.log("selected a geo_type")
+
           selected_geo_type = this.value
+          console.log("selecting a geo_type: " + selected_geo_type)
+
+          updateMap()
       }
 
       // Initialize a new map.
 
       L.mapbox.accessToken = "pk.eyJ1IjoiczJ0MiIsImEiOiJEN09jR2JNIn0.D-Q6idg2D7ZtTxkCRvaeGQ"
+      var mapbox_map_id = 'examples.map-i86nkdio' // examples.map-h67hf2ic
+      var map_options = {scrollWheelZoom:false}
+      var map_center = [39.90973623453719, -98.701171875]
+      var map_zoom = 4
+      var map = L.mapbox.map('map-container', mapbox_map_id, map_options)
+          .setView(map_center, map_zoom)
 
-      var map = L.mapbox.map("map-container", "examples.map-i86nkdio")
+      // Update the map.
 
-      //var request_url = "/cb_2013_us_county_5m.geojson"
-      //var request_url = "/cb_2013_us_cbsa_5m.geojson"
+      updateMap()
 
-      //d3.json(request_url, function(){
+      function updateMap(){
 
-      //    //geography = L.geoJson(feature, options)
+          // Destroy the existing map.
 
-      //}) // end d3.json
+          map.remove()
+
+          // Initialize a new map.
+
+          map = L.mapbox.map('map-container', mapbox_map_id, map_options)
+              .setView(map_center, map_zoom)
+
+          // Choose a geojson dataset.
+
+          switch(selected_geo_type){
+          case "statistical_area":
+              var geojson_data_file = "cb_2013_us_cbsa_5m.geojson"
+
+              break;
+          case "county":
+              var geojson_data_file = "cb_2013_us_county_5m.geojson"
+
+              break;
+          } // end switch
+          console.log("geojson_data_file: " + geojson_data_file)
+
+          // Add geojson features to map.
+
+          d3.json(geojson_data_file, function(error, json){
+
+              var feature_collection = json
+
+              // Add each feature to the map.
+
+              var feature = feature_collection.features[0]
+
+              console.log(feature)
+
+              var geography_name = feature.properties.NAME
+
+              var popup_content = '<strong>' + geography_name + '</strong> '
+
+              var geojson_options = {
+                  style: {
+                      fillColor: "#999", // colorScale(_____),
+                      color: "#000", // colorScale(______),
+                      weight: 2,
+                      opacity: 0.2, // opacityScale(_______),
+                      fillOpacity: 0.7, // opacityScale(_____),
+                      className: "geojson" + " " + selected_geo_type + " " + geography_name
+                  }
+              }
+
+              geography = L.geoJson(feature, geojson_options)
+
+              geography.bindPopup(popup_content)
+
+              geography.addTo(map)
 
 
 
 
+
+
+
+
+
+
+          }) // end d3.json
+
+      } // end updateMap()
 
   </script>
 </body>
