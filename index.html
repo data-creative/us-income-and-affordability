@@ -250,14 +250,16 @@
 
               var measure_values = affordabilities.entries().map(function(h){
                   var all_household_values = h.value[selected_metric]
-                  //switch(statistic_selector){
-                  //case "mean":
+
+                  switch(selected_statistic){
+                  case "mean":
                       var average_value = d3.mean(all_household_values)
-                      //break;
-                  //case "median":
-                       //var average_value = d3.median(all_household_values)
-                      //break;
-                  //}
+                      break;
+                  case "median":
+                      var average_value = d3.median(all_household_values)
+                      break;
+                  }
+
                   return average_value
               })
 
@@ -284,7 +286,14 @@
 
                       var geography_name = feature.properties.NAME
 
-                      var average_value = d3.mean(affordability[selected_metric]) // todo:switch
+                      switch(selected_statistic){
+                      case "mean":
+                          var average_value = d3.mean(affordability[selected_metric])
+                          break;
+                      case "median":
+                          var average_value = d3.median(affordability[selected_metric])
+                          break;
+                      }
 
                       // Add geography to map.
 
