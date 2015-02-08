@@ -151,6 +151,33 @@
 
           colorScale.range([ color_palette[3], color_palette[6], color_palette[8] ])
 
+          // Update measure value formatter function.
+
+          switch(selected_metric){
+          case "incomes":
+              var numberFormatter = function(n){
+                var thousandsSeparator = d3.format(",")
+                return "$" + thousandsSeparator(Math.round(n))
+              }
+              break;
+          case "housings":
+          case "renter_housings":
+          case "owner_housings":
+          case "housing_and_transportations":
+          case "renter_housing_and_transportations":
+          case "owner_housing_and_transportations":
+              var numberFormatter = function(n){
+                  return d3.round(n,2) + "%"
+              }
+              break;
+          case "renter_vs_owner_housings":
+          case "renter_vs_owner_housing_and_transportations":
+              var numberFormatter = function(n){
+                  return d3.round(n,2) + "%"
+              }
+              break;
+          }
+
           // Select datasets.
 
           switch(selected_geo_type){
@@ -241,8 +268,7 @@
 
                       // Add geography to map.
 
-                      var popup_content = "<strong>" + geography_name + "</strong>" +
-                          "<br/>" + average_value
+                      var popup_content = "<strong>" + geography_name + "</strong>: " + numberFormatter(average_value)
 
                       var geojson_options = {
                           style: {
