@@ -2,7 +2,7 @@
 <html>
 <head>
   <meta charset="utf-8">
-  <title>United States Housing Affordability by Census Geography</title>
+  <title>Income and Affordability by United States Geography</title>
   <link href='https://api.tiles.mapbox.com/mapbox.js/v2.1.4/mapbox.css' rel='stylesheet' />
   <style type="text/css">
 
@@ -16,22 +16,22 @@
 </head>
 <body>
   <header>
-    <h1>United States Housing Affordability by Census Geography</h1>
+    <h1>Income and Affordability by United States Geography</h1>
     <div id="menu">
       <select id="statistic-selector">
         <option value="mean" selected="true">Mean</option>
         <option value="median" >Median</option>
       </select>
       <select id="metric-selector">
-        <option value="incomes" selected="true">Income</option>
-        <option value="housings">Housing Cost as Percent of Income</option>
+        <option value="incomes">Income</option>
+        <option value="housings" selected="true">Housing Cost as Percent of Income</option>
         <option value="renter_housings">Housing Cost as Percent of Income (Renters)</option>
         <option value="owner_housings">Housing Cost as Percent of Income (Owners)</option>
-        <option value="renter_vs_owner_housings">Housing Cost as Percent of Income (Renters vs Owners)</option>
+        <!--option value="renter_vs_owner_housings">Housing Cost as Percent of Income (Renters vs Owners)</option-->
         <option value="housing_and_transportations">Housing and Transportation Cost as Percent of Income</option>
         <option value="renter_housing_and_transportations">Housing and Transportation Cost as Percent of Income (Renters)</option>
         <option value="owner_housing_and_transportations">Housing and Transportation Cost as Percent of Income (Owners)</option>
-        <option value="renter_vs_owner_housing_and_transportations">Housing and Transportation Cost as Percent of Income (Renters vs Owners)</option>
+        <!--option value="renter_vs_owner_housing_and_transportations">Housing and Transportation Cost as Percent of Income (Renters vs Owners)</option-->
       </select>
       <select id="geo-type-selector">
         <option value="cbsa" selected="true">by Core Based Statistical Area (CBSA)</option>
@@ -52,17 +52,7 @@
   <script src='https://api.tiles.mapbox.com/mapbox.js/v2.1.4/mapbox.js'></script>
   <script type="text/javascript">
 
-      // Initialize color and opacity scales.
-
-      var color_palette = colorbrewer.YlGn[9]
-
-      var colorScale = d3.scale.linear()
-          .range([ color_palette[3], color_palette[6], color_palette[8] ])
-
-      var opacityScale = d3.scale.linear()
-          .range([0.7, 0.75])
-
-      // Get, set, and observe selected statistic.
+      // Get, set, and observe statistic selections.
 
       var statistic_selector = document.getElementById("statistic-selector")
 
@@ -72,11 +62,11 @@
 
       function selectStatistic(){
           selected_statistic = this.value
-          console.log("selected " + selected_statistic)
+          //console.log("selected " + selected_statistic)
           updateMap()
       }
 
-      // Get, set, and observe selected metric.
+      // Get, set, and observe metric selections.
 
       var metric_selector = document.getElementById("metric-selector")
 
@@ -86,11 +76,11 @@
 
       function selectMetric(){
           selected_metric = this.value
-          console.log("selected " + selected_metric)
+          //console.log("selected " + selected_metric)
           updateMap()
       }
 
-      // Get, set, and observe selected geography type.
+      // Get, set, and observe geography type selections.
 
       var geo_type_selector = document.getElementById("geo-type-selector")
 
@@ -100,9 +90,16 @@
 
       function selectGeoType(){
           selected_geo_type = this.value
-          console.log("selected " + selected_geo_type)
+          //console.log("selected " + selected_geo_type)
           updateMap()
       }
+
+      // Initialize color and opacity scales.
+
+      var colorScale = d3.scale.linear()
+
+      var opacityScale = d3.scale.linear()
+          .range([0.7, 0.85])
 
       // Initialize map.
 
@@ -132,6 +129,28 @@
           map = L.mapbox.map('map-container', mapbox_map_id, map_options)
               .setView(map_center, map_zoom)
 
+          // Update color scale.
+
+          switch(selected_metric){
+          case "incomes":
+              var color_palette = colorbrewer.Greens[9]
+              break;
+          case "housings":
+          case "renter_housings":
+          case "owner_housings":
+          case "housing_and_transportations":
+          case "renter_housing_and_transportations":
+          case "owner_housing_and_transportations":
+              var color_palette = colorbrewer.Reds[9]
+              break;
+          case "renter_vs_owner_housings":
+          case "renter_vs_owner_housing_and_transportations":
+              var color_palette = colorbrewer.RdYlGn[9]
+              break;
+          }
+
+          colorScale.range([ color_palette[3], color_palette[6], color_palette[8] ])
+
           // Select datasets.
 
           switch(selected_geo_type){
@@ -156,14 +175,14 @@
                   var identifier = row[selected_geo_type].replace(/\'/g, "") // remove single quotes
 
                   var affordability = {
-                      name: row[selected_geo_type + "_name"].replace(/\'/g, ""), // remove single quotes
-                      incomes: [ parseInt(row.hh_type1_income), parseInt(row.hh_type2_income), parseInt(row.hh_type3_income), parseInt(row.hh_type4_income), parseInt(row.hh_type5_income), parseInt(row.hh_type6_income), parseInt(row.hh_type7_income), parseInt(row.hh_type8_income) ],
-                      housings: [ parseFloat(row.hh_type1_h), parseFloat(row.hh_type2_h), parseFloat(row.hh_type3_h), parseFloat(row.hh_type4_h), parseFloat(row.hh_type5_h), parseFloat(row.hh_type6_h), parseFloat(row.hh_type7_h), parseFloat(row.hh_type8_h) ],
-                      renter_housings: [ parseFloat(row.hh_type8_h_rent), parseFloat(row.hh_type2_h_rent), parseFloat(row.hh_type3_h_rent), parseFloat(row.hh_type4_h_rent), parseFloat(row.hh_type5_h_rent), parseFloat(row.hh_type6_h_rent), parseFloat(row.hh_type7_h_rent), parseFloat(row.hh_type8_h_rent) ],
-                      owner_housings: [ parseFloat(row.hh_type1_h_own), parseFloat(row.hh_type2_h_own), parseFloat(row.hh_type3_h_own), parseFloat(row.hh_type4_h_own), parseFloat(row.hh_type5_h_own), parseFloat(row.hh_type6_h_own), parseFloat(row.hh_type7_h_own), parseFloat(row.hh_type8_h_own) ],
-                      housing_and_transportations: [ parseFloat(row.hh_type1_ht), parseFloat(row.hh_type2_ht), parseFloat(row.hh_type3_ht), parseFloat(row.hh_type4_ht), parseFloat(row.hh_type5_ht), parseFloat(row.hh_type6_ht), parseFloat(row.hh_type7_ht), parseFloat(row.hh_type8_ht) ],
-                      renter_housing_and_transportations: [ parseFloat(row.hh_type1_ht_rent), parseFloat(row.hh_type2_ht_rent), parseFloat(row.hh_type3_ht_rent), parseFloat(row.hh_type4_ht_rent), parseFloat(row.hh_type5_ht_rent), parseFloat(row.hh_type6_ht_rent), parseFloat(row.hh_type7_ht_rent), parseFloat(row.hh_type8_ht_rent) ],
-                      owner_housing_and_transportations: [ parseFloat(row.hh_type1_ht_own), parseFloat(row.hh_type2_ht_own), parseFloat(row.hh_type3_ht_own), parseFloat(row.hh_type4_ht_own), parseFloat(row.hh_type5_ht_own), parseFloat(row.hh_type6_ht_own), parseFloat(row.hh_type7_ht_own), parseFloat(row.hh_type8_ht_own) ]
+                      "name": row[selected_geo_type + "_name"].replace(/\'/g, ""), // remove single quotes
+                      "incomes": [ parseInt(row.hh_type1_income), parseInt(row.hh_type2_income), parseInt(row.hh_type3_income), parseInt(row.hh_type4_income), parseInt(row.hh_type5_income), parseInt(row.hh_type6_income), parseInt(row.hh_type7_income), parseInt(row.hh_type8_income) ],
+                      "housings": [ parseFloat(row.hh_type1_h), parseFloat(row.hh_type2_h), parseFloat(row.hh_type3_h), parseFloat(row.hh_type4_h), parseFloat(row.hh_type5_h), parseFloat(row.hh_type6_h), parseFloat(row.hh_type7_h), parseFloat(row.hh_type8_h) ],
+                      "renter_housings": [ parseFloat(row.hh_type8_h_rent), parseFloat(row.hh_type2_h_rent), parseFloat(row.hh_type3_h_rent), parseFloat(row.hh_type4_h_rent), parseFloat(row.hh_type5_h_rent), parseFloat(row.hh_type6_h_rent), parseFloat(row.hh_type7_h_rent), parseFloat(row.hh_type8_h_rent) ],
+                      "owner_housings": [ parseFloat(row.hh_type1_h_own), parseFloat(row.hh_type2_h_own), parseFloat(row.hh_type3_h_own), parseFloat(row.hh_type4_h_own), parseFloat(row.hh_type5_h_own), parseFloat(row.hh_type6_h_own), parseFloat(row.hh_type7_h_own), parseFloat(row.hh_type8_h_own) ],
+                      "housing_and_transportations": [ parseFloat(row.hh_type1_ht), parseFloat(row.hh_type2_ht), parseFloat(row.hh_type3_ht), parseFloat(row.hh_type4_ht), parseFloat(row.hh_type5_ht), parseFloat(row.hh_type6_ht), parseFloat(row.hh_type7_ht), parseFloat(row.hh_type8_ht) ],
+                      "renter_housing_and_transportations": [ parseFloat(row.hh_type1_ht_rent), parseFloat(row.hh_type2_ht_rent), parseFloat(row.hh_type3_ht_rent), parseFloat(row.hh_type4_ht_rent), parseFloat(row.hh_type5_ht_rent), parseFloat(row.hh_type6_ht_rent), parseFloat(row.hh_type7_ht_rent), parseFloat(row.hh_type8_ht_rent) ],
+                      "owner_housing_and_transportations": [ parseFloat(row.hh_type1_ht_own), parseFloat(row.hh_type2_ht_own), parseFloat(row.hh_type3_ht_own), parseFloat(row.hh_type4_ht_own), parseFloat(row.hh_type5_ht_own), parseFloat(row.hh_type6_ht_own), parseFloat(row.hh_type7_ht_own), parseFloat(row.hh_type8_ht_own) ]
                   }
 
                   affordabilities.set(identifier, affordability)
@@ -171,25 +190,32 @@
               })
               .await(ready)
 
-          // Integrate data.
+          // Integrate and make use of data.
 
           function ready(error, feature_collection){
-              console.log("ready...")
+              console.log(selected_statistic)
+              console.log(selected_metric)
+              console.log(selected_geo_type)
+              console.log(affordabilities.entries()[0])
+              console.log(feature_collection.features[0])
 
               // Update color and opacity scale domains.
 
               var measure_values = affordabilities.entries().map(function(h){
-                  switch(statistic_selector){
-                  case "median":
-                      return d3.median( h.value.housings)
-                      break;
-                  case "mean":
-                      return d3.median( h.value.housings)
-                      break;
-                  }
+                  var all_household_values = h.value[selected_metric]
+                  //switch(statistic_selector){
+                  //case "mean":
+                      var average_value = d3.mean(all_household_values)
+                      //break;
+                  //case "median":
+                       //var average_value = d3.median(all_household_values)
+                      //break;
+                  //}
+                  return average_value
               })
 
               var measure_quantiles = [ d3.min(measure_values), d3.mean(measure_values), d3.max(measure_values) ]
+              console.log(measure_quantiles)
 
               colorScale.domain(measure_quantiles)
 
@@ -207,24 +233,24 @@
 
                   var affordability = affordabilities.get(geography_identifier)
 
-                  if (affordability && affordability.housings){
+                  if (affordability && affordability[selected_metric]){
 
                       var geography_name = feature.properties.NAME
 
-                      var median_housing_affordability = d3.median(affordability.housings)
+                      var average_value = d3.mean(affordability[selected_metric]) // todo:switch
 
                       // Add geography to map.
 
                       var popup_content = "<strong>" + geography_name + "</strong>" +
-                          "<br/>" + median_housing_affordability
+                          "<br/>" + average_value
 
                       var geojson_options = {
                           style: {
-                              fillColor: "#999", // colorScale(_____),
-                              color: "#000", // colorScale(______),
+                              fillColor: colorScale(average_value),
+                              color: colorScale(average_value),
                               weight: 2,
-                              opacity: 0.2, // opacityScale(_______),
-                              fillOpacity: 0.7, // opacityScale(_____),
+                              opacity: opacityScale(average_value),
+                              fillOpacity: opacityScale(average_value),
                               className: "geojson" + " " + selected_geo_type + " " + geography_name
                           }
                       }
