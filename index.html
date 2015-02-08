@@ -2,12 +2,25 @@
 <html>
 <head>
   <meta charset="utf-8">
-  <title>Location Affordability</title>
+  <title>Affordability in the United States</title>
+  <script src='https://api.tiles.mapbox.com/mapbox.js/v2.1.4/mapbox.js'></script>
+  <link href='https://api.tiles.mapbox.com/mapbox.js/v2.1.4/mapbox.css' rel='stylesheet' />
+  <style type="text/css">
+
+      #menu {margin-top:1em; margin-bottom:1em;}
+      #map-container {height: 35em; width:100%; border:1px solid #000;}
+
+  </style>
 </head>
 <body>
-  <header><h1>Location Affordability</h1></header>
-  <div id="menu"></div>
-  <div id="chart"></div>
+  <header><h1>Affordability in the United States</h1></header>
+  <div id="menu">
+    <select id="geo_type_selector">
+      <option value="county" >by County</option>
+      <option value="cbsa" selected="true">by Core Based Statistical Area (CBSA)</option>
+    </select>
+  </div>
+  <div id="map-container"></div>
   <footer>
     <p>
       <a href="http://bl.ocks.org/s2t2/cd45dfd8007fcf83fef7">view</a> | 
@@ -17,7 +30,37 @@
   <script src="http://d3js.org/d3.v3.min.js" charset="utf-8"></script>
   <script type="text/javascript">
 
-      console.log("hello")
+      // Get, set, and observe selected geography type.
+
+      var geo_type_selector = document.getElementById("geo_type_selector")
+
+      var selected_geo_type = geo_type_selector.value
+
+      geo_type_selector.addEventListener("change", selectGeoType, false)
+
+      function selectGeoType(){
+          console.log("selected a geo_type")
+          selected_geo_type = this.value
+      }
+
+      // Initialize a new map.
+
+      L.mapbox.accessToken = "pk.eyJ1IjoiczJ0MiIsImEiOiJEN09jR2JNIn0.D-Q6idg2D7ZtTxkCRvaeGQ"
+
+      var map = L.mapbox.map("map-container", "examples.map-i86nkdio")
+
+      //var request_url = "/cb_2013_us_county_5m.geojson"
+      //var request_url = "/cb_2013_us_cbsa_5m.geojson"
+
+      //d3.json(request_url, function(){
+
+      //    //geography = L.geoJson(feature, options)
+
+      //}) // end d3.json
+
+
+
+
 
   </script>
 </body>
