@@ -53,67 +53,48 @@
   <script src='https://api.tiles.mapbox.com/mapbox.js/v2.1.4/mapbox.js'></script>
   <script type="text/javascript">
 
-      // Get, set, and observe statistic selections.
-
-      var statistic_selector = document.getElementById("statistic-selector")
-
-      var selected_statistic = statistic_selector.value
-
-      statistic_selector.addEventListener("change", selectStatistic, false)
-
-      function selectStatistic(){
-          selected_statistic = this.value
-          //console.log("selected " + selected_statistic)
-          updateMap()
-      }
-
-      // Get, set, and observe metric selections.
-
-      var metric_selector = document.getElementById("metric-selector")
-
-      var selected_metric = metric_selector.value
-
-      metric_selector.addEventListener("change", selectMetric, false)
-
-      function selectMetric(){
-          selected_metric = this.value
-          //console.log("selected " + selected_metric)
-          updateMap()
-      }
-
-      // Get, set, and observe geography type selections.
+      // Get, set, and observe selections.
 
       var geo_type_selector = document.getElementById("geo-type-selector")
-
       var selected_geo_type = geo_type_selector.value
-
       geo_type_selector.addEventListener("change", selectGeoType, false)
+
+      var metric_selector = document.getElementById("metric-selector")
+      var selected_metric = metric_selector.value
+      metric_selector.addEventListener("change", selectMetric, false)
+
+      var statistic_selector = document.getElementById("statistic-selector")
+      var selected_statistic = statistic_selector.value
+      statistic_selector.addEventListener("change", selectStatistic, false)
 
       function selectGeoType(){
           selected_geo_type = this.value
-          //console.log("selected " + selected_geo_type)
+          updateMap()
+      }
+
+      function selectStatistic(){
+          selected_statistic = this.value
+          updateMap()
+      }
+
+      function selectMetric(){
+          selected_metric = this.value
           updateMap()
       }
 
       // Initialize color and opacity scales.
 
       var colorScale = d3.scale.linear()
-
       var opacityScale = d3.scale.linear()
           .range([0.7, 0.85])
 
       // Initialize map.
 
       L.mapbox.accessToken = "pk.eyJ1IjoiczJ0MiIsImEiOiJEN09jR2JNIn0.D-Q6idg2D7ZtTxkCRvaeGQ"
-
       var mapbox_map_id = 'examples.map-i86nkdio' // examples.map-h67hf2ic
-
       var map_options = {scrollWheelZoom:false}
-
       var map_center = [39.90973623453719, -98.701171875]
-
       var map_zoom = 4
-
       var map = L.mapbox.map('map-container', mapbox_map_id, map_options)
           .setView(map_center, map_zoom)
 
@@ -123,14 +104,13 @@
 
       function updateMap(){
 
-          // Destroy existing map and initialize a new map.
+          // Destroy existing map and initialize new map.
 
           map.remove()
-
           map = L.mapbox.map('map-container', mapbox_map_id, map_options)
               .setView(map_center, map_zoom)
 
-          // Update color scale.
+          // Apply palette to color scale.
 
           switch(selected_metric){
           case "incomes":
@@ -149,10 +129,9 @@
               var color_palette = colorbrewer.Blues[9]
               break;
           }
-
           colorScale.range([ color_palette[3], color_palette[6], color_palette[8] ])
 
-          // Update measure value formatter function.
+          // Define display format of measure values.
 
           switch(selected_metric){
           case "incomes":
@@ -179,7 +158,9 @@
               break;
           }
 
-          // Select datasets.
+          // Get data from each dataset and integrate after each has finished loading.
+
+          var affordabilities = d3.map()
 
           switch(selected_geo_type){
           case "cbsa":
@@ -192,15 +173,10 @@
               break;
           }
 
-          // Get and transform data.
-
-          var affordabilities = d3.map()
-
           queue()
               .defer(d3.json, geojson_data_file)
               .defer(d3.csv, affordability_data_file, function(row){
                   var identifier = row[selected_geo_type].replace(/\'/g, "") // remove single quotes
-
                   var affordability = {
                       "name": row[selected_geo_type + "_name"].replace(/\'/g, ""), // remove single quotes
                       "incomes": [ parseInt(row.hh_type1_income), parseInt(row.hh_type2_income), parseInt(row.hh_type3_income), parseInt(row.hh_type4_income), parseInt(row.hh_type5_income), parseInt(row.hh_type6_income), parseInt(row.hh_type7_income), parseInt(row.hh_type8_income) ],
@@ -219,7 +195,7 @@
                           parseFloat(row.hh_type6_h_own) - parseFloat(row.hh_type6_h_rent),
                           parseFloat(row.hh_type7_h_own) - parseFloat(row.hh_type7_h_rent),
                           parseFloat(row.hh_type8_h_own) - parseFloat(row.hh_type8_h_rent)
-                      ], // negative values indicate renter is paying relatively more as percent of income; positive values indicate owner is paying relatively more
+                      ], // positive values indicate owner is paying relatively more
                       "renter_vs_owner_housing_and_transportations": [
                           parseFloat(row.hh_type1_ht_own) - parseFloat(row.hh_type1_ht_rent),
                           parseFloat(row.hh_type2_ht_own) - parseFloat(row.hh_type2_ht_rent),
@@ -229,28 +205,26 @@
                           parseFloat(row.hh_type6_ht_own) - parseFloat(row.hh_type6_ht_rent),
                           parseFloat(row.hh_type7_ht_own) - parseFloat(row.hh_type7_ht_rent),
                           parseFloat(row.hh_type8_ht_own) - parseFloat(row.hh_type8_ht_rent)
-                      ]// negative values indicate renter is paying relatively more; positive values indicate owner is paying relatively more
+                      ]// positive values indicate owner is paying relatively more;
                   }
-
                   affordabilities.set(identifier, affordability)
-
               })
               .await(ready)
 
-          // Integrate and make use of data.
-
           function ready(error, feature_collection){
-              console.log(selected_statistic)
-              console.log(selected_metric)
-              console.log(selected_geo_type)
+              var selections = {
+                statistic: selected_statistic,
+                metric: selected_metric,
+                geo_type: selected_geo_type
+              }
+              console.log(selections)
               console.log(affordabilities.entries()[0])
               console.log(feature_collection.features[0])
 
-              // Update color and opacity scale domains.
+              // Update color and opacity scales.
 
               var measure_values = affordabilities.entries().map(function(h){
                   var all_household_values = h.value[selected_metric]
-
                   switch(selected_statistic){
                   case "mean":
                       var average_value = d3.mean(all_household_values)
@@ -259,33 +233,24 @@
                       var average_value = d3.median(all_household_values)
                       break;
                   }
-
                   return average_value
               })
-
               var measure_quantiles = [ d3.min(measure_values), d3.mean(measure_values), d3.max(measure_values) ]
               console.log(measure_quantiles)
-
               colorScale.domain(measure_quantiles)
-
               opacityScale.domain(measure_quantiles)
 
               // Add geographies to map.
 
               var geographies_bounds = []
-
               feature_collection.features.forEach(function(feature){
 
-                  // Lookup affordability.
+                  // Lookup affordability measures.
 
                   var geography_identifier = feature.properties.GEOID
-
                   var affordability = affordabilities.get(geography_identifier)
-
                   if (affordability && affordability[selected_metric]){
-
                       var geography_name = feature.properties.NAME
-
                       switch(selected_statistic){
                       case "mean":
                           var average_value = d3.mean(affordability[selected_metric])
@@ -298,7 +263,6 @@
                       // Add geography to map.
 
                       var popup_content = "<strong>" + geography_name + "</strong>: " + numberFormatter(average_value)
-
                       var geojson_options = {
                           style: {
                               fillColor: colorScale(average_value),
@@ -309,22 +273,18 @@
                               className: "geojson" + " " + selected_geo_type + " " + geography_name
                           }
                       }
-
                       var geography = L.geoJson(feature, geojson_options)
-
                       geography.bindPopup(popup_content)
-
                       geography.addTo(map)
 
                       // Collect geography bounds.
 
                       var geography_bounds = geography.getBounds()
-
                       geographies_bounds.push(geography_bounds)
 
                   }
                   else {
-                    // console.log("couldn't find geography " + geography_identifier)
+                    console.log("couldn't find geography " + geography_identifier)
                   }
 
               }) // end forEach
@@ -337,11 +297,6 @@
 
       } // end updateMap()
 
-  </script>
-  <!-- load openui5 library to satisfy hackathon judgement criteria ... -->
-  <script src="https://openui5.hana.ondemand.com/resources/sap-ui-core.js"
-      data-sap-ui-libs="sap.m"
-      data-sap-ui-theme="sap_bluecrystal">
   </script>
 </body>
 </html>

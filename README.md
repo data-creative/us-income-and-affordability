@@ -157,12 +157,11 @@ cd cb_2013_us_county_5m/
 ogr2ogr -f GeoJSON -t_srs crs:84 cb_2013_us_county_5m.geojson cb_2013_us_county_5m.shp
 ````
 
-#### Maps
+#### Mapping
 
 Resources:
  + http://gis.stackexchange.com/a/70557
  + http://bsumm.net/2013/03/31/analyzing-mbostocks-queue-js.html
  + https://github.com/mbostock/queue
  + http://bl.ocks.org/mbostock/4060606
-
-
+ + https://github.com/mbostock/d3/wiki/Arrays#d3_map
