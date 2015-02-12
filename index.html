@@ -18,24 +18,32 @@
   <header>
     <h1>Income and Affordability Measures by United States Geography</h1>
     <div id="menu">
-      <select id="statistic-selector">
-        <option value="mean" selected="true">Mean</option>
-        <option value="median" >Median</option>
-      </select>
       <select id="metric-selector">
         <option value="incomes">Income</option>
         <option value="housings" selected="true">Housing Cost as Percent of Income</option>
-        <option value="renter_housings">Housing Cost as Percent of Income (Renters)</option>
+        <!--option value="renter_housings">Housing Cost as Percent of Income (Renters)</option>
         <option value="owner_housings">Housing Cost as Percent of Income (Owners)</option>
-        <option value="renter_vs_owner_housings">Housing Cost as Percent of Income (Renters diff from Owners)</option>
+        <option value="renter_vs_owner_housings">Housing Cost as Percent of Income (Renters diff from Owners)</option-->
         <option value="housing_and_transportations">Housing and Transportation Cost as Percent of Income</option>
-        <option value="renter_housing_and_transportations">Housing and Transportation Cost as Percent of Income (Renters)</option>
+        <!--option value="renter_housing_and_transportations">Housing and Transportation Cost as Percent of Income (Renters)</option>
         <option value="owner_housing_and_transportations">Housing and Transportation Cost as Percent of Income (Owners)</option>
-        <option value="renter_vs_owner_housing_and_transportations">Housing and Transportation Cost as Percent of Income (Renters diff from Owners)</option>
+        <option value="renter_vs_owner_housing_and_transportations">Housing and Transportation Cost as Percent of Income (Renters diff from Owners)</option-->
       </select>
+      <span>for</span>
+      <select id="household-type-selector">
+        <option value="hh_type1" selected="true">Median-Income</option>
+        <option value="hh_type2" >Very Low-Income</option>
+        <option value="hh_type3" >Working Individual </option>
+        <option value="hh_type4" >Single Professional </option>
+        <option value="hh_type5" >Retired Couple</option>
+        <option value="hh_type6" >Single-Parent Family</option>
+        <option value="hh_type7" >Moderate-Income Family</option>
+        <option value="hh_type7" >Dual-Professional Family</option>
+      </select>
+      <span>Households</span>
       <select id="geo-type-selector">
-        <option value="cbsa" selected="true">by Core Based Statistical Area (CBSA)</option>
-        <option value="county" >by County</option>
+        <option value="cbsa" selected="true">by US Census Core Based Statistical Area (CBSA)</option>
+        <option value="county" >by US Census County</option>
       </select>
     </div>
   </header>
@@ -63,17 +71,17 @@
       var selected_metric = metric_selector.value
       metric_selector.addEventListener("change", selectMetric, false)
 
-      var statistic_selector = document.getElementById("statistic-selector")
-      var selected_statistic = statistic_selector.value
-      statistic_selector.addEventListener("change", selectStatistic, false)
+      var household_type_selector = document.getElementById("household-type-selector")
+      var selected_household_type = household_type_selector.value
+      household_type_selector.addEventListener("change", selectHouseholdType, false)
 
       function selectGeoType(){
           selected_geo_type = this.value
           updateMap()
       }
 
-      function selectStatistic(){
-          selected_statistic = this.value
+      function selectHouseholdType(){
+          selected_household_type = this.value
           updateMap()
       }
 
@@ -158,9 +166,7 @@
               break;
           }
 
-          // Get data from each dataset and integrate after each has finished loading.
-
-          var affordabilities = d3.map()
+          // Choose geography and affordability datasets based on selected geography type.
 
           switch(selected_geo_type){
           case "cbsa":
@@ -173,39 +179,106 @@
               break;
           }
 
+          // Get data from each dataset and integrate after each has finished loading.
+
+          var affordabilities = d3.map()
+
           queue()
               .defer(d3.json, geojson_data_file)
               .defer(d3.csv, affordability_data_file, function(row){
                   var identifier = row[selected_geo_type].replace(/\'/g, "") // remove single quotes
                   var affordability = {
                       "name": row[selected_geo_type + "_name"].replace(/\'/g, ""), // remove single quotes
-                      "incomes": [ parseInt(row.hh_type1_income), parseInt(row.hh_type2_income), parseInt(row.hh_type3_income), parseInt(row.hh_type4_income), parseInt(row.hh_type5_income), parseInt(row.hh_type6_income), parseInt(row.hh_type7_income), parseInt(row.hh_type8_income) ],
-                      "housings": [ parseFloat(row.hh_type1_h), parseFloat(row.hh_type2_h), parseFloat(row.hh_type3_h), parseFloat(row.hh_type4_h), parseFloat(row.hh_type5_h), parseFloat(row.hh_type6_h), parseFloat(row.hh_type7_h), parseFloat(row.hh_type8_h) ],
-                      "renter_housings": [ parseFloat(row.hh_type8_h_rent), parseFloat(row.hh_type2_h_rent), parseFloat(row.hh_type3_h_rent), parseFloat(row.hh_type4_h_rent), parseFloat(row.hh_type5_h_rent), parseFloat(row.hh_type6_h_rent), parseFloat(row.hh_type7_h_rent), parseFloat(row.hh_type8_h_rent) ],
-                      "owner_housings": [ parseFloat(row.hh_type1_h_own), parseFloat(row.hh_type2_h_own), parseFloat(row.hh_type3_h_own), parseFloat(row.hh_type4_h_own), parseFloat(row.hh_type5_h_own), parseFloat(row.hh_type6_h_own), parseFloat(row.hh_type7_h_own), parseFloat(row.hh_type8_h_own) ],
-                      "housing_and_transportations": [ parseFloat(row.hh_type1_ht), parseFloat(row.hh_type2_ht), parseFloat(row.hh_type3_ht), parseFloat(row.hh_type4_ht), parseFloat(row.hh_type5_ht), parseFloat(row.hh_type6_ht), parseFloat(row.hh_type7_ht), parseFloat(row.hh_type8_ht) ],
-                      "renter_housing_and_transportations": [ parseFloat(row.hh_type1_ht_rent), parseFloat(row.hh_type2_ht_rent), parseFloat(row.hh_type3_ht_rent), parseFloat(row.hh_type4_ht_rent), parseFloat(row.hh_type5_ht_rent), parseFloat(row.hh_type6_ht_rent), parseFloat(row.hh_type7_ht_rent), parseFloat(row.hh_type8_ht_rent) ],
-                      "owner_housing_and_transportations": [ parseFloat(row.hh_type1_ht_own), parseFloat(row.hh_type2_ht_own), parseFloat(row.hh_type3_ht_own), parseFloat(row.hh_type4_ht_own), parseFloat(row.hh_type5_ht_own), parseFloat(row.hh_type6_ht_own), parseFloat(row.hh_type7_ht_own), parseFloat(row.hh_type8_ht_own) ],
-                      "renter_vs_owner_housings": [
-                          parseFloat(row.hh_type1_h_own) - parseFloat(row.hh_type1_h_rent),
-                          parseFloat(row.hh_type2_h_own) - parseFloat(row.hh_type2_h_rent),
-                          parseFloat(row.hh_type3_h_own) - parseFloat(row.hh_type3_h_rent),
-                          parseFloat(row.hh_type4_h_own) - parseFloat(row.hh_type4_h_rent),
-                          parseFloat(row.hh_type5_h_own) - parseFloat(row.hh_type5_h_rent),
-                          parseFloat(row.hh_type6_h_own) - parseFloat(row.hh_type6_h_rent),
-                          parseFloat(row.hh_type7_h_own) - parseFloat(row.hh_type7_h_rent),
-                          parseFloat(row.hh_type8_h_own) - parseFloat(row.hh_type8_h_rent)
-                      ], // positive values indicate owner is paying relatively more
-                      "renter_vs_owner_housing_and_transportations": [
-                          parseFloat(row.hh_type1_ht_own) - parseFloat(row.hh_type1_ht_rent),
-                          parseFloat(row.hh_type2_ht_own) - parseFloat(row.hh_type2_ht_rent),
-                          parseFloat(row.hh_type3_ht_own) - parseFloat(row.hh_type3_ht_rent),
-                          parseFloat(row.hh_type4_ht_own) - parseFloat(row.hh_type4_ht_rent),
-                          parseFloat(row.hh_type5_ht_own) - parseFloat(row.hh_type5_ht_rent),
-                          parseFloat(row.hh_type6_ht_own) - parseFloat(row.hh_type6_ht_rent),
-                          parseFloat(row.hh_type7_ht_own) - parseFloat(row.hh_type7_ht_rent),
-                          parseFloat(row.hh_type8_ht_own) - parseFloat(row.hh_type8_ht_rent)
-                      ]// positive values indicate owner is paying relatively more;
+                      "incomes": {
+                          "hh_type1": parseInt(row.hh_type1_income),
+                          "hh_type2": parseInt(row.hh_type2_income),
+                          "hh_type3": parseInt(row.hh_type3_income),
+                          "hh_type4": parseInt(row.hh_type4_income),
+                          "hh_type5": parseInt(row.hh_type5_income),
+                          "hh_type6": parseInt(row.hh_type6_income),
+                          "hh_type7": parseInt(row.hh_type7_income),
+                          "hh_type8": parseInt(row.hh_type8_income)
+                      },
+                      "housings": {
+                          "hh_type1": parseFloat(row.hh_type1_h),
+                          "hh_type2": parseFloat(row.hh_type2_h),
+                          "hh_type3": parseFloat(row.hh_type3_h),
+                          "hh_type4": parseFloat(row.hh_type4_h),
+                          "hh_type5": parseFloat(row.hh_type5_h),
+                          "hh_type6": parseFloat(row.hh_type6_h),
+                          "hh_type7": parseFloat(row.hh_type7_h),
+                          "hh_type8": parseFloat(row.hh_type8_h)
+                      },
+                      //"renter_housings": {
+                      //    "hh_type1": parseFloat(row.hh_type8_h_rent),
+                      //    "hh_type2": parseFloat(row.hh_type2_h_rent),
+                      //    "hh_type3": parseFloat(row.hh_type3_h_rent),
+                      //    "hh_type4": parseFloat(row.hh_type4_h_rent),
+                      //    "hh_type5": parseFloat(row.hh_type5_h_rent),
+                      //    "hh_type6": parseFloat(row.hh_type6_h_rent),
+                      //    "hh_type7": parseFloat(row.hh_type7_h_rent),
+                      //    "hh_type8": parseFloat(row.hh_type8_h_rent)
+                      //},
+                      //"owner_housings": {
+                      //    "hh_type1": parseFloat(row.hh_type1_h_own),
+                      //    "hh_type2": parseFloat(row.hh_type2_h_own),
+                      //    "hh_type3": parseFloat(row.hh_type3_h_own),
+                      //    "hh_type4": parseFloat(row.hh_type4_h_own),
+                      //    "hh_type5": parseFloat(row.hh_type5_h_own),
+                      //    "hh_type6": parseFloat(row.hh_type6_h_own),
+                      //    "hh_type7": parseFloat(row.hh_type7_h_own),
+                      //    "hh_type8": parseFloat(row.hh_type8_h_own)
+                      //},
+                      "housing_and_transportations": {
+                          "hh_type1": parseFloat(row.hh_type1_ht),
+                          "hh_type2": parseFloat(row.hh_type2_ht),
+                          "hh_type3": parseFloat(row.hh_type3_ht),
+                          "hh_type4": parseFloat(row.hh_type4_ht),
+                          "hh_type5": parseFloat(row.hh_type5_ht),
+                          "hh_type6": parseFloat(row.hh_type6_ht),
+                          "hh_type7": parseFloat(row.hh_type7_ht),
+                          "hh_type8": parseFloat(row.hh_type8_ht)
+                      }//,
+                      //"renter_housing_and_transportations": {
+                      //    "hh_type1": parseFloat(row.hh_type1_ht_rent),
+                      //    "hh_type2": parseFloat(row.hh_type2_ht_rent),
+                      //    "hh_type3": parseFloat(row.hh_type3_ht_rent),
+                      //    "hh_type4": parseFloat(row.hh_type4_ht_rent),
+                      //    "hh_type5": parseFloat(row.hh_type5_ht_rent),
+                      //    "hh_type6": parseFloat(row.hh_type6_ht_rent),
+                      //    "hh_type7": parseFloat(row.hh_type7_ht_rent),
+                      //    "hh_type8": parseFloat(row.hh_type8_ht_rent)
+                      //},
+                      //"owner_housing_and_transportations": {
+                      //    "hh_type1": parseFloat(row.hh_type1_ht_own),
+                      //    "hh_type2": parseFloat(row.hh_type2_ht_own),
+                      //    "hh_type3": parseFloat(row.hh_type3_ht_own),
+                      //    "hh_type4": parseFloat(row.hh_type4_ht_own),
+                      //    "hh_type5": parseFloat(row.hh_type5_ht_own),
+                      //    "hh_type6": parseFloat(row.hh_type6_ht_own),
+                      //    "hh_type7": parseFloat(row.hh_type7_ht_own),
+                      //    "hh_type8": parseFloat(row.hh_type8_ht_own)
+                      //},
+                      //"renter_vs_owner_housings": { // positive values indicate owner is paying relatively more
+                      //    "hh_type1": parseFloat(row.hh_type1_h_own) - parseFloat(row.hh_type1_h_rent),
+                      //    "hh_type2": parseFloat(row.hh_type2_h_own) - parseFloat(row.hh_type2_h_rent),
+                      //    "hh_type3": parseFloat(row.hh_type3_h_own) - parseFloat(row.hh_type3_h_rent),
+                      //    "hh_type4": parseFloat(row.hh_type4_h_own) - parseFloat(row.hh_type4_h_rent),
+                      //    "hh_type5": parseFloat(row.hh_type5_h_own) - parseFloat(row.hh_type5_h_rent),
+                      //    "hh_type6": parseFloat(row.hh_type6_h_own) - parseFloat(row.hh_type6_h_rent),
+                      //    "hh_type7": parseFloat(row.hh_type7_h_own) - parseFloat(row.hh_type7_h_rent),
+                      //    "hh_type8": parseFloat(row.hh_type8_h_own) - parseFloat(row.hh_type8_h_rent)
+                      //},
+                      //"renter_vs_owner_housing_and_transportations": { // positive values indicate owner is paying relatively more
+                      //    "hh_type1": parseFloat(row.hh_type1_ht_own) - parseFloat(row.hh_type1_ht_rent),
+                      //    "hh_type2": parseFloat(row.hh_type2_ht_own) - parseFloat(row.hh_type2_ht_rent),
+                      //    "hh_type3": parseFloat(row.hh_type3_ht_own) - parseFloat(row.hh_type3_ht_rent),
+                      //    "hh_type4": parseFloat(row.hh_type4_ht_own) - parseFloat(row.hh_type4_ht_rent),
+                      //    "hh_type5": parseFloat(row.hh_type5_ht_own) - parseFloat(row.hh_type5_ht_rent),
+                      //    "hh_type6": parseFloat(row.hh_type6_ht_own) - parseFloat(row.hh_type6_ht_rent),
+                      //    "hh_type7": parseFloat(row.hh_type7_ht_own) - parseFloat(row.hh_type7_ht_rent),
+                      //    "hh_type8": parseFloat(row.hh_type8_ht_own) - parseFloat(row.hh_type8_ht_rent)
+                      //}
                   }
                   affordabilities.set(identifier, affordability)
               })
@@ -213,7 +286,7 @@
 
           function ready(error, feature_collection){
               var selections = {
-                statistic: selected_statistic,
+                household_type: selected_household_type,
                 metric: selected_metric,
                 geo_type: selected_geo_type
               }
@@ -223,18 +296,7 @@
 
               // Update color and opacity scales.
 
-              var measure_values = affordabilities.entries().map(function(h){
-                  var all_household_values = h.value[selected_metric]
-                  switch(selected_statistic){
-                  case "mean":
-                      var average_value = d3.mean(all_household_values)
-                      break;
-                  case "median":
-                      var average_value = d3.median(all_household_values)
-                      break;
-                  }
-                  return average_value
-              })
+              var measure_values = affordabilities.entries().map(function(h){ return h.value[selected_metric][selected_household_type]})
               var measure_quantiles = [ d3.min(measure_values), d3.mean(measure_values), d3.max(measure_values) ]
               console.log(measure_quantiles)
               colorScale.domain(measure_quantiles)
@@ -243,36 +305,44 @@
               // Add geographies to map.
 
               var geographies_bounds = []
+
               feature_collection.features.forEach(function(feature){
 
                   // Lookup affordability measures.
 
                   var geography_identifier = feature.properties.GEOID
+
                   var affordability = affordabilities.get(geography_identifier)
-                  if (affordability && affordability[selected_metric]){
+
+                  if (affordability){
+
+                      var affordability_measure = affordability[selected_metric]
+
+                      //if(!affordability_measure){
+                      //    debugger
+                      //}
+
+                      // Configure geography display properties.
+
                       var geography_name = feature.properties.NAME
-                      switch(selected_statistic){
-                      case "mean":
-                          var average_value = d3.mean(affordability[selected_metric])
-                          break;
-                      case "median":
-                          var average_value = d3.median(affordability[selected_metric])
-                          break;
+
+                      var measure_value = affordability_measure[selected_household_type]
+
+                      var popup_content = "<strong>" + geography_name + "</strong>: " + numberFormatter(measure_value)
+
+                      var geojson_options = {
+                          style: {
+                              fillColor: colorScale(measure_value),
+                              color: colorScale(measure_value),
+                              weight: 2,
+                              opacity: opacityScale(measure_value),
+                              fillOpacity: opacityScale(measure_value),
+                              className: "geojson" + " " + selected_geo_type + " " + geography_name
+                          }
                       }
 
                       // Add geography to map.
 
-                      var popup_content = "<strong>" + geography_name + "</strong>: " + numberFormatter(average_value)
-                      var geojson_options = {
-                          style: {
-                              fillColor: colorScale(average_value),
-                              color: colorScale(average_value),
-                              weight: 2,
-                              opacity: opacityScale(average_value),
-                              fillOpacity: opacityScale(average_value),
-                              className: "geojson" + " " + selected_geo_type + " " + geography_name
-                          }
-                      }
                       var geography = L.geoJson(feature, geojson_options)
                       geography.bindPopup(popup_content)
                       geography.addTo(map)
@@ -285,7 +355,7 @@
                   }
                   else {
                     console.log("couldn't find geography " + geography_identifier)
-                  }
+                  } // end if
 
               }) // end forEach
 

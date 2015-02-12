@@ -41,8 +41,23 @@ Location affordability data is available from the census via data.gov on three [
 The [Location Affordability Index Data Dictionary](http://lai.locationaffordability.info/lai_data_dictionary.pdf)
 applies to each of the three datasets.
 
-COLUMN | SUFFIX | DESCRIPTION
---- | --- | ---
+It defines eight types of households.
+
+COLUMN PREFIX | HOUSEHOLD TYPE | SIZE OF HH | INCOME | # COMMUTERS
+--- | --- | --- | --- | ---
+hh_type1_ | Median-Income | Family | 4 Median Income for Region | 2
+hh_type2_ | Very Low-Income | Individual | 1 National Poverty Line | 1
+hh_type3_ | Working Individual | 1 | 50% of Median Income for Region | 1
+hh_type4_ | Single Professional | 1 | 135% of Median Income for Region | 1
+hh_type5_ | Retired Couple | 2 | 80% of Median Income for Region | 0
+hh_type6_ | Single-Parent Family | 3 | 50% of Median Income for Region | 1
+hh_type7_ | Moderate-Income Family | 3 | 80% of Median Income for Region | 1
+hh_type8_ | Dual-Professional Family | 4 | 150% of Median Income for Region | 2
+
+It defines at least the following metrics for each type of household, and provides measures of each.
+
+COLUMN SUFFIX | DESCRIPTION
+--- | ---
 `income_min` | The minimum income for the geography as defined for the household above.
 `income_max` | The maximum income for the geography as defined for the household above.
 `income` |  The income for the geography as defined for the household above.
@@ -51,7 +66,8 @@ COLUMN | SUFFIX | DESCRIPTION
 `ht` | The modeled housing and transportation costs as a percent of income.
 `h` |  The modeled housing costs as a percent of income.
 `t` |  The modeled transportation costs as a percent of income.
-... | ...
+... | ... and more
+
 
 ###### 1. [Location Affordability Index: All Core Based Statistical Areas (CBSAs)](http://catalog.data.gov/dataset/location-affordability-index-all-core-based-statistical-areas-cbsas)
 
@@ -165,3 +181,5 @@ Resources:
  + https://github.com/mbostock/queue
  + http://bl.ocks.org/mbostock/4060606
  + https://github.com/mbostock/d3/wiki/Arrays#d3_map
+
+> LESSON: It is not methodologically sound to aggregate measures across household types (i.e. to calculate the mean or median of all household types within a given geography).
