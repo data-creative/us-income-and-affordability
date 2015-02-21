@@ -2,7 +2,9 @@
 
 ### Usage
 
-View at http://bl.ocks.org/s2t2/cd45dfd8007fcf83fef7, or develop and view locally at http://localhost:8888/.
+View at http://bl.ocks.org/s2t2/raw/cd45dfd8007fcf83fef7/.
+
+Or develop locally at http://localhost:8888/.
 
 ```` sh
 git clone git@gist.github.com:/cd45dfd8007fcf83fef7.git
