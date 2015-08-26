@@ -49,9 +49,26 @@
   </header>
   <div id="map-container"></div>
   <!--div id="chart-container"></div-->
+  <span>Selet map tile-set:</span>
+  <select id="map-tileset-selector">
+    <option value="mapbox.streets" selected="true">Streets</option>
+    <option value="mapbox.light" >Light</option>
+    <option value="mapbox.dark" >Dark </option>
+    <option value="mapbox.satellite" >Satellite </option>
+    <option value="mapbox.streets-satellite" >Streets and Satellite</option>
+    <option value="mapbox.wheatpaste" >Wheatpaste</option>
+    <option value="mapbox.streets-basic" >Streets (basic)</option>
+    <option value="mapbox.comic" >Comic</option>
+    <option value="mapbox.outdoors" >Outdoors</option>
+    <option value="mapbox.run-bike-hike" >Run/Bike/Hike</option>
+    <option value="mapbox.pencil" >Pencil</option>
+    <option value="mapbox.pirates" >Pirates</option>
+    <option value="mapbox.emerald" >Emerald</option>
+    <option value="mapbox.high-contrast" >High-contrast</option>
+  </select>
   <footer>
     <p>
-      <a href="http://bl.ocks.org/s2t2/cd45dfd8007fcf83fef7">view</a> | 
+      <a href="http://bl.ocks.org/s2t2/cd45dfd8007fcf83fef7">view</a> |
       <a href="https://gist.github.com/s2t2/cd45dfd8007fcf83fef7/">source</a>
     </p>
   </footer>
@@ -75,6 +92,10 @@
       var selected_household_type = household_type_selector.value
       household_type_selector.addEventListener("change", selectHouseholdType, false)
 
+      var map_tileset_selector = document.getElementById("map-tileset-selector")
+      var selected_tileset = map_tileset_selector.value
+      map_tileset_selector.addEventListener("change", selectTileset, false)
+
       function selectGeoType(){
           selected_geo_type = this.value
           updateMap()
@@ -90,6 +111,11 @@
           updateMap()
       }
 
+      function selectTileset(){
+          selected_tileset = this.value
+          updateMap()
+      }
+
       // Initialize color and opacity scales.
 
       var colorScale = d3.scale.linear()
@@ -99,11 +125,11 @@
       // Initialize map.
 
       L.mapbox.accessToken = "pk.eyJ1IjoiczJ0MiIsImEiOiJEN09jR2JNIn0.D-Q6idg2D7ZtTxkCRvaeGQ"
-      var mapbox_map_id = 'examples.map-i86nkdio' // examples.map-h67hf2ic
+      //var mapbox_map_id = selected_tileset // 'mapbox.streets' //'examples.map-i86nkdio' // examples.map-h67hf2ic
       var map_options = {scrollWheelZoom:false}
       var map_center = [39.90973623453719, -98.701171875]
       var map_zoom = 4
-      var map = L.mapbox.map('map-container', mapbox_map_id, map_options)
+      var map = L.mapbox.map('map-container', selected_tileset, map_options)
           .setView(map_center, map_zoom)
 
       // Update map.
@@ -115,7 +141,7 @@
           // Destroy existing map and initialize new map.
 
           map.remove()
-          map = L.mapbox.map('map-container', mapbox_map_id, map_options)
+          map = L.mapbox.map('map-container', selected_tileset, map_options)
               .setView(map_center, map_zoom)
 
           // Apply palette to color scale.
