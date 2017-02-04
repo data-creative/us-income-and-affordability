@@ -129,7 +129,7 @@
       var map_options = {scrollWheelZoom:false}
       var map_center = [39.90973623453719, -98.701171875]
       var map_zoom = 4
-      var map = L.mapbox.map('map-container', selected_tileset, map_options)
+      var map = L.mapbox.map('map-container', selected_tileset, map_options) // for tilesets, see: https://www.mapbox.com/api-documentation/#maps
           .setView(map_center, map_zoom)
 
       // Update map.
