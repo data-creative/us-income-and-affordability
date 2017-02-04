@@ -1,6 +1,6 @@
-### Notes
+# Data Dictionary
 
-#### Affordability Data
+## Affordability Data
 
 Location affordability data is available from the census via data.gov on three [different](https://www.census.gov/geo/maps-data/data/tiger-cart-boundary.html) [levels](http://censusreporter.org/glossary/#term-cdp):
  1. core-based-statistical-area (like a Designated Market Area (DMA))
@@ -37,7 +37,9 @@ COLUMN SUFFIX | DESCRIPTION
 ... | ... and more
 
 
-##### 1. [Location Affordability Index: All Core Based Statistical Areas (CBSAs)](http://catalog.data.gov/dataset/location-affordability-index-all-core-based-statistical-areas-cbsas)
+### By CBSA
+
+[Location Affordability Index: All Core Based Statistical Areas (CBSAs)](http://catalog.data.gov/dataset/location-affordability-index-all-core-based-statistical-areas-cbsas)
 
 There are [943](http://en.wikipedia.org/wiki/List_of_Core_Based_Statistical_Areas) [CBSAs](http://en.wikipedia.org/wiki/Core_Based_Statistical_Area) with identifiers ranging from '10020' to '49780'.
 
@@ -62,7 +64,9 @@ cbsa  | cbsa_name
 '10780' | 'Alexandria, LA'
 ... | ...
 
-##### 2. [Location Affordability Index: All Census Counties](http://catalog.data.gov/dataset/location-affordability-index-all-census-counties)
+### By County
+
+[Location Affordability Index: All Census Counties](http://catalog.data.gov/dataset/location-affordability-index-all-census-counties)
 
 There are 3,144 counties with identifiers ranging from '01001' to '56045'.
 
@@ -86,7 +90,9 @@ county  | county_name
 '01031' | 'Coffee'
 ... | ...
 
-##### 3. [Location Affordability Index: All Census Places](http://catalog.data.gov/dataset/location-affordability-index-all-census-places)
+### By Place
+
+[Location Affordability Index: All Census Places](http://catalog.data.gov/dataset/location-affordability-index-all-census-places)
 
 There are 24,011 places with identifiers ranging from '0100100' to '5686737'.
 
@@ -109,45 +115,3 @@ place | place_name
 '0102116' | 'Arab'
 '0102260' | 'Ardmore'
 ... | ...
-
-#### Geography Data
-
-Resources:
-
- + [CSA Shapes](https://catalog.data.gov/dataset/r2-combined-statistical-area-csa-2013-tiger-line-shapefile)
- + [CBSA Shapes](https://catalog.data.gov/dataset/r2-core-based-statistical-area-cbsa-2013-tiger-line-shapefile)
- + https://www.census.gov/geo/maps-data/data/tiger-cart-boundary.html
- + [Cartographic Boundary Shapefiles - Metropolitan and Micropolitan Statistical Areas and Related Statistical Areas](https://www.census.gov/geo/maps-data/data/cbf/cbf_msa.html) -- 500k, 5m, 20m
- + [Cartographic Boundary Shapefiles - Counties](https://www.census.gov/geo/maps-data/data/cbf/cbf_counties.html) -- 500k, 5m, 20m
- + [Cartographic Boundary Shapefiles - Places (Incorporated Places and Census Designated Places)](https://www.census.gov/geo/maps-data/data/cbf/cbf_place.html) -- state by state datasets
- + http://ben.balter.com/2013/06/26/how-to-convert-shapefiles-to-geojson-for-use-on-github/
- + https://github.com/censusreporter/census-api
- + http://www.census.gov/data/developers/data-sets.html
- + http://www.census.gov/data/developers/data-sets/TIGERweb-map-service.html
-
-Shapefile to GeoJSON conversion process:
-
-```` sh
-brew install gdal
-````
-
-```` sh
-cd cb_2013_us_cbsa_5m/
-ogr2ogr -f GeoJSON -t_srs crs:84 cb_2013_us_cbsa_5m.geojson cb_2013_us_cbsa_5m.shp
-````
-
-```` sh
-cd cb_2013_us_county_5m/
-ogr2ogr -f GeoJSON -t_srs crs:84 cb_2013_us_county_5m.geojson cb_2013_us_county_5m.shp
-````
-
-#### Mapping
-
-Resources:
- + http://gis.stackexchange.com/a/70557
- + http://bsumm.net/2013/03/31/analyzing-mbostocks-queue-js.html
- + https://github.com/mbostock/queue
- + http://bl.ocks.org/mbostock/4060606
- + https://github.com/mbostock/d3/wiki/Arrays#d3_map
-
-> NOTE: It is not methodologically sound to aggregate measures across household types (i.e. to calculate the mean or median of all household types within a given geography).
