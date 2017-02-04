@@ -4,6 +4,6 @@ An interactive map depicting measures of income and affordability by United Stat
 
 ## Usage
 
-View live at ____________.
+View live at http://data-creative.info/us-income-and-affordability/.
 
 ## [License](/LICENSE)
